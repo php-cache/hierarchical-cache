@@ -11,10 +11,10 @@
 
 namespace Cache\Hierarchy;
 
+use Cache\Adapter\Common\Exception\InvalidArgumentException;
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Cache\InvalidArgumentException;
 
 /**
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
@@ -45,6 +45,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
         if (!$this->isHierarchyKey($key)) {
             return $this->cache->getItem($key, $tags);
         }
+
         // TODO: Implement getItem() method.
     }
 
@@ -53,10 +54,12 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function getItems(array $keys = [], array $tags = [])
     {
-        if (!$this->isHierarchyKey($keys)) {
-            return $this->cache->getItems($keys, $tags);
+        $items = [];
+        foreach ($keys as $key) {
+            $items[$key] = $this->getItem($key, $tags);
         }
-        // TODO: Implement getItems() method.
+
+        return $items;
     }
 
     /**
@@ -94,10 +97,12 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function deleteItems(array $keys, array $tags = [])
     {
-        if (!$this->isHierarchyKey($keys)) {
-            return $this->cache->deleteItems($keys, $tags);
+        $result = true;
+        foreach ($keys as $key) {
+            $result = $result && $this->deleteItem($key, $tags);
         }
-        // TODO: Implement deleteItems() method.
+
+        return $result;
     }
 
     /**
@@ -105,7 +110,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function save(CacheItemInterface $item)
     {
-        $this->cache->save($item);
+        return $this->cache->save($item);
     }
 
     /**
@@ -113,7 +118,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function saveDeferred(CacheItemInterface $item)
     {
-        $this->cache->saveDeferred($item);
+        return $this->cache->saveDeferred($item);
     }
 
     /**
@@ -121,7 +126,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function commit()
     {
-        $this->cache->commit();
+        return $this->cache->commit();
     }
 
     /**
@@ -132,6 +137,10 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     private function isHierarchyKey($key)
     {
+        if (!is_string($key)) {
+            throw new InvalidArgumentException(sprintf('Key must be string.'));
+        }
+
         return substr($key, 0, 1) === self::SEPARATOR;
     }
 }

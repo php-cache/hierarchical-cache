@@ -20,7 +20,6 @@ $item = $pool->getItem('|users|4711|followers');
 $pool->deleteItem($item);
 
 $pool->hasItem('|users|4711|followers|12|likes'); // False
-
 ```
 
 | Feature | Supported |

@@ -16,8 +16,7 @@ for ($i = 0; $i < 100; $i++) {
 
 $pool->hasItem('|users|4711|followers|12|likes'); // True
 
-$item = $pool->getItem('|users|4711|followers');
-$pool->deleteItem($item);
+$pool->deleteItem('|users|4711|followers');
 
 $pool->hasItem('|users|4711|followers|12|likes'); // False
 ```

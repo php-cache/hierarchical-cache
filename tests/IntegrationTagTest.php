@@ -11,7 +11,6 @@
 
 namespace Cache\Hierarchy;
 
-use Cache\Adapter\Apc\ApcCachePool;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use Cache\IntegrationTests\TaggableCachePoolTest;
 

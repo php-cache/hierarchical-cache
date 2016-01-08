@@ -37,49 +37,91 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
         $this->cache = $cache;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getItem($key, array $tags = [])
     {
+        if (!$this->isHierarchyKey($key)) {
+            return $this->cache->getItem($key, $tags);
+        }
         // TODO: Implement getItem() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getItems(array $keys = [], array $tags = [])
     {
+        if (!$this->isHierarchyKey($keys)) {
+            return $this->cache->getItems($keys, $tags);
+        }
         // TODO: Implement getItems() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasItem($key, array $tags = [])
     {
+        if (!$this->isHierarchyKey($key)) {
+            return $this->cache->hasItem($key, $tags);
+        }
         // TODO: Implement hasItem() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function clear(array $tags = [])
     {
-        // TODO: Implement clear() method.
+        return $this->cache->clear($tags);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteItem($key, array $tags = [])
     {
+        if (!$this->isHierarchyKey($key)) {
+            return $this->cache->deleteItem($key, $tags);
+        }
         // TODO: Implement deleteItem() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function deleteItems(array $keys, array $tags = [])
     {
+        if (!$this->isHierarchyKey($keys)) {
+            return $this->cache->deleteItems($keys, $tags);
+        }
         // TODO: Implement deleteItems() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function save(CacheItemInterface $item)
     {
-        // TODO: Implement save() method.
+        $this->cache->save($item);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function saveDeferred(CacheItemInterface $item)
     {
-        // TODO: Implement saveDeferred() method.
+        $this->cache->saveDeferred($item);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function commit()
     {
-        // TODO: Implement commit() method.
+        $this->cache->commit();
     }
 
     /**

@@ -11,7 +11,9 @@
 
 namespace Cache\Hierarchy;
 
+use Cache\Adapter\Common\CacheItem;
 use Cache\Adapter\Common\Exception\InvalidArgumentException;
+use Cache\Taggable\TaggableItemInterface;
 use Cache\Taggable\TaggablePoolInterface;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -42,11 +44,23 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function getItem($key, array $tags = [])
     {
-        if (!$this->isHierarchyKey($key)) {
-            return $this->cache->getItem($key, $tags);
+        $item = $this->cache->getItem($key, $tags);
+        if (!$this->isHierarchyKey($key) || !$item->isHit()) {
+            return $item;
         }
 
-        // TODO: Implement getItem() method.
+        if (!$this->validateParents($key, $tags)) {
+            return $item;
+        }
+
+        // Invalid item
+        if ($item instanceof TaggableItemInterface) {
+            $key = $item->getTaggedKey();
+        } else {
+            $key = $item->getKey();
+        }
+
+        return new CacheItem($key);
     }
 
     /**
@@ -67,10 +81,12 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function hasItem($key, array $tags = [])
     {
-        if (!$this->isHierarchyKey($key)) {
-            return $this->cache->hasItem($key, $tags);
+        $hasItem = $this->cache->hasItem($key, $tags);
+        if (!$this->isHierarchyKey($key) || $hasItem === false) {
+            return $hasItem;
         }
-        // TODO: Implement hasItem() method.
+
+        return $this->validateParents($key, $tags);
     }
 
     /**
@@ -86,10 +102,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function deleteItem($key, array $tags = [])
     {
-        if (!$this->isHierarchyKey($key)) {
-            return $this->cache->deleteItem($key, $tags);
-        }
-        // TODO: Implement deleteItem() method.
+        return $this->cache->deleteItem($key, $tags);
     }
 
     /**
@@ -97,12 +110,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function deleteItems(array $keys, array $tags = [])
     {
-        $result = true;
-        foreach ($keys as $key) {
-            $result = $result && $this->deleteItem($key, $tags);
-        }
-
-        return $result;
+        return $this->cache->deleteItems($keys, $tags);
     }
 
     /**
@@ -110,6 +118,15 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     public function save(CacheItemInterface $item)
     {
+        $parts = $this->explodeKey($item->getKey());
+        $parentKey = '';
+        foreach ($parts as $part) {
+            $parentKey .= $part;
+            $parent = $this->cache->getItem($parentKey);
+            $parent->set(null);
+            $this->cache->save($parent);
+        }
+
         return $this->cache->save($item);
     }
 
@@ -142,5 +159,43 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
         }
 
         return substr($key, 0, 1) === self::SEPARATOR;
+    }
+
+    /**
+     * @param string $key
+     * @param array  $tags
+     *
+     * @return bool true if parents are valid
+     */
+    private function validateParents($key, array $tags)
+    {
+        $parts = $this->explodeKey($key);
+        $parentKey = '';
+        foreach ($parts as $part) {
+            $parentKey .= $part;
+            if (!$this->cache->hasItem($parentKey, $tags)) {
+                // Invalid item
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @param CacheItemInterface $item
+     *
+     * @return array
+     */
+    private function explodeKey($key)
+    {
+        $parts = explode(self::SEPARATOR, $key);
+
+        unset($parts[0]);
+        foreach ($parts as &$part) {
+            $part = self::SEPARATOR.$part;
+        }
+
+        return $parts;
     }
 }

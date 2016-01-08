@@ -11,11 +11,10 @@
 
 namespace Cache\Hierarchy;
 
-use Cache\Adapter\Apc\ApcCachePool;
 use Cache\Adapter\PHPArray\ArrayCachePool;
-use Cache\IntegrationTests\CachePoolTest as BaseTest;
+use Cache\IntegrationTests\CachePoolTest;
 
-class IntegrationPoolTest extends BaseTest
+class IntegrationPoolTest extends CachePoolTest
 {
     private $cache;
 

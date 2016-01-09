@@ -35,7 +35,6 @@ trait HierarchicalCachePoolTrait
      * @param string &$pathKey A cache key for the path. If this key is changed everything beyond that path is changed.
      *
      * @return string
-     * @throws InvalidArgumentException
      */
     protected function getHierarchyKey($key, &$pathKey = null)
     {
@@ -79,14 +78,9 @@ trait HierarchicalCachePoolTrait
      * @param string $key
      *
      * @return bool
-     * @throws InvalidArgumentException
      */
     private function isHierarchyKey($key)
     {
-        if (!is_string($key)) {
-            throw new InvalidArgumentException(sprintf('Key must be string.'));
-        }
-
         return substr($key, 0, 1) === HierarchicalPoolInterface::HIERARCHY_SEPARATOR;
     }
 

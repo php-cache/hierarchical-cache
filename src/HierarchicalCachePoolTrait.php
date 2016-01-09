@@ -38,25 +38,24 @@ trait HierarchicalCachePoolTrait
      */
     protected function getHierarchyKey($key, &$pathKey = null)
     {
-        if (!$this->isHierarchyKey($key)) {
+        $hierarchyKey = new HierarchyKey($key, TaggablePoolInterface::TAG_SEPARATOR);
+
+        if (!$hierarchyKey->isValid()) {
             return $key;
         }
 
-        $key = $this->explodeKey($key);
-
         $keyString = '';
         $pathKey = 'path:';
-        foreach ($key as $name) {
+
+        foreach ($hierarchyKey->iterator() as $name) {
             $keyString .= $name;
             $pathKey = 'path:' . $keyString;
 
-            if (isset($this->keyCache[$pathKey])) {
-                $index = $this->keyCache[$pathKey];
-            } else {
-                $index = $this->getValueForStore($pathKey);
-                $this->keyCache[$pathKey] = $index;
+            if (!array_key_exists($pathKey, $this->keyCache)) {
+                $this->keyCache[$pathKey] = $this->getValueForStore($pathKey);
             }
 
+            $index = $this->keyCache[$pathKey];
             $keyString .= ':' . $index . ':';
         }
 
@@ -69,33 +68,5 @@ trait HierarchicalCachePoolTrait
     protected function clearHierarchyKeyCache()
     {
         $this->keyCache = [];
-    }
-
-
-    /**
-     * A hierarchy key MUST begin with the separator.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function isHierarchyKey($key)
-    {
-        return substr($key, 0, 1) === HierarchicalPoolInterface::HIERARCHY_SEPARATOR;
-    }
-
-
-    /**
-     * @param string $key
-     *
-     * @return array
-     */
-    private function explodeKey($string)
-    {
-        list($key, $tag) = explode(TaggablePoolInterface::TAG_SEPARATOR, $string.TaggablePoolInterface::TAG_SEPARATOR.TaggablePoolInterface::TAG_SEPARATOR);
-        $parts = explode(HierarchicalPoolInterface::HIERARCHY_SEPARATOR, $key);
-        unset($parts[0]);
-
-        return array_map(function ($a) use ($tag) {return $a.':'.$tag;},$parts);
     }
 }

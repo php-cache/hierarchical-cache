@@ -23,8 +23,6 @@ use Psr\Cache\CacheItemPoolInterface;
  */
 class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolInterface, TaggablePoolInterface
 {
-    const HIERARCHY_SEPARATOR = '|';
-
     /**
      * @var CacheItemPoolInterface
      */
@@ -158,7 +156,7 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
             throw new InvalidArgumentException(sprintf('Key must be string.'));
         }
 
-        return substr($key, 0, 1) === self::TAG_SEPARATOR;
+        return substr($key, 0, 1) === self::HIERARCHY_SEPARATOR;
     }
 
     /**
@@ -189,11 +187,11 @@ class HierarchicalCachePool implements CacheItemPoolInterface, HierarchicalPoolI
      */
     private function explodeKey($key)
     {
-        $parts = explode(self::TAG_SEPARATOR, $key);
+        $parts = explode(self::HIERARCHY_SEPARATOR, $key);
 
         unset($parts[0]);
         foreach ($parts as &$part) {
-            $part = self::TAG_SEPARATOR.$part;
+            $part = self::HIERARCHY_SEPARATOR.$part;
         }
 
         return $parts;

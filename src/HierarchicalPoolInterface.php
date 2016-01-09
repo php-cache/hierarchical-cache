@@ -4,5 +4,5 @@ namespace Cache\Hierarchy;
 
 interface HierarchicalPoolInterface
 {
-    const SEPARATOR = '|';
+    const HIERARCHY_SEPARATOR = '|';
 }

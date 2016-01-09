@@ -87,7 +87,7 @@ trait HierarchicalCachePoolTrait
             throw new InvalidArgumentException(sprintf('Key must be string.'));
         }
 
-        return substr($key, 0, 1) === HierarchicalPoolInterface::SEPARATOR;
+        return substr($key, 0, 1) === HierarchicalPoolInterface::HIERARCHY_SEPARATOR;
     }
 
 
@@ -98,8 +98,8 @@ trait HierarchicalCachePoolTrait
      */
     private function explodeKey($string)
     {
-        list($key, $tag) = explode(TaggablePoolInterface::SEPARATOR, $string.TaggablePoolInterface::SEPARATOR.TaggablePoolInterface::SEPARATOR);
-        $parts = explode(HierarchicalPoolInterface::SEPARATOR, $key);
+        list($key, $tag) = explode(TaggablePoolInterface::TAG_SEPARATOR, $string.TaggablePoolInterface::TAG_SEPARATOR.TaggablePoolInterface::TAG_SEPARATOR);
+        $parts = explode(HierarchicalPoolInterface::HIERARCHY_SEPARATOR, $key);
         unset($parts[0]);
 
         return array_map(function ($a) use ($tag) {return $a.':'.$tag;},$parts);

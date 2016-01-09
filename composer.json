@@ -1,6 +1,6 @@
 {
     "name":              "cache/hierarchical-cache",
-    "description":       "A PSR-6 cache implementation using hierarchical. This implementation supports tags",
+    "description":       "A helper trait and interface to your PSR-6 cache to support hierarchical keys.",
     "type":              "library",
     "license":           "MIT",
     "minimum-stability": "stable",
@@ -30,7 +30,7 @@
         "php":                  "^5.5|^7.0",
         "psr/cache":            "1.0.0",
         "cache/adapter-common": "^0.1",
-        "cache/taggable-cache": "dev-master"
+        "cache/taggable-cache": "^0.3"
     },
     "require-dev":
     {

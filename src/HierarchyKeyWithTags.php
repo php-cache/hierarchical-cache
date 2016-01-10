@@ -37,14 +37,14 @@ final class HierarchyKeyWithTags implements HierarchyKeyInterface
           $lastHierarchyKeyPart . $this->tagSeparator
         );
 
-        return array_map
-            (function($hierarchicalKeyPart) use ($tag) {
-                return "{$hierarchicalKeyPart}:{$tag}";
-            },
-            array_merge(
-              $hierarchyKeyParts,
-              array_filter($lastHierarchyKeyPart)
-            )
+        return array_map(
+          function($hierarchicalKeyPart) use ($tag) {
+              return "{$hierarchicalKeyPart}:{$tag}";
+          },
+          array_merge(
+            $hierarchyKeyParts,
+            array_filter($lastHierarchyKeyPart)
+          )
         );
     }
 }

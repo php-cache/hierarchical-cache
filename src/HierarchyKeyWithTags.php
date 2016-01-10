@@ -29,15 +29,22 @@ final class HierarchyKeyWithTags implements HierarchyKeyInterface
      */
     public function iterator()
     {
-        list(, $tag) = explode($this->tagSeparator, $this->hierarchyKey.$this->tagSeparator);
+        $hierarchyKeyParts = $this->hierarchyKey->iterator();
+        $lastHierarchyKeyPart = array_pop($hierarchyKeyParts);
 
-        return array_map(function($hierarchicalKeyPart) use ($tag) {
-            return $hierarchicalKeyPart.':'.$tag;
-        }, $this->hierarchyKey->iterator());
-    }
+        list ($lastHierarchyKeyPart, $tag) = explode(
+          $this->tagSeparator,
+          $lastHierarchyKeyPart . $this->tagSeparator
+        );
 
-    public function __toString()
-    {
-        return (string) $this->hierarchyKey;
+        return array_map
+            (function($hierarchicalKeyPart) use ($tag) {
+                return "{$hierarchicalKeyPart}:{$tag}";
+            },
+            array_merge(
+              $hierarchyKeyParts,
+              array_filter($lastHierarchyKeyPart)
+            )
+        );
     }
 }

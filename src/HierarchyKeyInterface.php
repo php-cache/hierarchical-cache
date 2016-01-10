@@ -14,6 +14,4 @@ interface HierarchyKeyInterface
      * @return array
      */
     public function iterator();
-
-    public function __toString();
 }

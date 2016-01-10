@@ -36,13 +36,4 @@ final class HierarchyKey implements HierarchyKeyInterface
 
         return array_splice(explode(self::SEPARATOR, $this->key), 1);
     }
-
-    public function __toString()
-    {
-        if (!$this->isValid()) {
-            new Exception(sprintf('%s is not a valid HierarchyKey', $this->key));
-        }
-
-        return $this->key;
-    }
 }

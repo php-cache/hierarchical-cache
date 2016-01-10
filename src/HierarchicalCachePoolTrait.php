@@ -38,7 +38,10 @@ trait HierarchicalCachePoolTrait
      */
     protected function getHierarchyKey($key, &$pathKey = null)
     {
-        $hierarchyKey = new HierarchyKey($key, TaggablePoolInterface::TAG_SEPARATOR);
+        $hierarchyKey = new HierarchyKeyWithTags(
+          new HierarchyKey($key),
+          TaggablePoolInterface::TAG_SEPARATOR
+        );
 
         if (!$hierarchyKey->isValid()) {
             return $key;

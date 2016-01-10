@@ -2,21 +2,19 @@
 
 namespace Cache\Hierarchy;
 
-final class HierarchyKey
+use Exception;
+
+final class HierarchyKey implements HierarchyKeyInterface
 {
     const SEPARATOR = '|';
-
     private $key;
-    private $keySeparator;
 
     /**
      * @param string $key
-     * @param string $keySeparator
      */
-    public function __construct($key, $keySeparator)
+    public function __construct($key)
     {
         $this->key = $key;
-        $this->keySeparator = $keySeparator;
     }
 
     /**
@@ -32,10 +30,19 @@ final class HierarchyKey
      */
     public function iterator()
     {
-        list($key, $tag) = explode($this->keySeparator, $this->key.$this->keySeparator.$this->keySeparator);
-        $parts = explode(HierarchyKey::SEPARATOR, $key);
-        unset($parts[0]);
+        if (!$this->isValid()) {
+            new Exception(sprintf('%s is not a valid HierarchyKey', $this->key));
+        }
 
-        return array_map(function ($a) use ($tag) {return $a.':'.$tag;},$parts);
+        return array_splice(explode(self::SEPARATOR, $this->key), 1);
+    }
+
+    public function __toString()
+    {
+        if (!$this->isValid()) {
+            new Exception(sprintf('%s is not a valid HierarchyKey', $this->key));
+        }
+
+        return $this->key;
     }
 }

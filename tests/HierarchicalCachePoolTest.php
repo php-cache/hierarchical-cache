@@ -14,12 +14,17 @@ namespace Cache\Hierarchy\Tests;
 use Cache\Hierarchy\Tests\Helper\CachePool;
 
 /**
- * We should not use constans on interfaces in the tests. Tests should break if the constant is changed.
+ * We should not use constants on interfaces in the tests. Tests should break if the constant is changed.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
 class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 {
+    private function assertEqualsSha1($expected, $result, $message = '')
+    {
+        $this->assertEquals(sha1($expected), $result, $message);
+    }
+
     public function testGetHierarchyKey()
     {
         $path = null;
@@ -31,13 +36,13 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         $result = $pool->exposeGetHierarchyKey('|foo|bar', $path);
-        $this->assertEquals('root!!idx_1!foo!!idx_2!bar!!idx_3!', $result);
-        $this->assertEquals('path!root!!idx_1!foo!!idx_2!bar!', $path);
+        $this->assertEqualsSha1('root!!idx_1!foo!!idx_2!bar!!idx_3!', $result);
+        $this->assertEqualsSha1('path!root!!idx_1!foo!!idx_2!bar!', $path);
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         $result = $pool->exposeGetHierarchyKey('|', $path);
-        $this->assertEquals('path!root!', $path);
-        $this->assertEquals('root!!idx_1!', $result);
+        $this->assertEqualsSha1('path!root!', $path);
+        $this->assertEqualsSha1('root!!idx_1!', $result);
     }
 
     public function testGetHierarchyKeyWithTags()
@@ -51,13 +56,13 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         $result = $pool->exposeGetHierarchyKey('|foo|bar!tagHash', $path);
-        $this->assertEquals('root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash!idx_3!', $result);
-        $this->assertEquals('path!root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash', $path);
+        $this->assertEqualsSha1('root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash!idx_3!', $result);
+        $this->assertEqualsSha1('path!root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash', $path);
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         $result = $pool->exposeGetHierarchyKey('|!tagHash', $path);
-        $this->assertEquals('path!root!tagHash', $path);
-        $this->assertEquals('root!tagHash!idx_1!', $result);
+        $this->assertEqualsSha1('path!root!tagHash', $path);
+        $this->assertEqualsSha1('root!tagHash!idx_1!', $result);
     }
 
     public function testGetHierarchyKeyEmptyCache()
@@ -70,12 +75,12 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($path);
 
         $result = $pool->exposeGetHierarchyKey('|foo|bar', $path);
-        $this->assertEquals('root!!!foo!!!bar!!!', $result);
-        $this->assertEquals('path!root!!!foo!!!bar!', $path);
+        $this->assertEqualsSha1('root!!!foo!!!bar!!!', $result);
+        $this->assertEqualsSha1('path!root!!!foo!!!bar!', $path);
 
         $result = $pool->exposeGetHierarchyKey('|', $path);
-        $this->assertEquals('path!root!', $path);
-        $this->assertEquals('root!!!', $result);
+        $this->assertEqualsSha1('path!root!', $path);
+        $this->assertEqualsSha1('root!!!', $result);
     }
 
     public function testKeyCache()
@@ -84,13 +89,13 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         $result = $pool->exposeGetHierarchyKey('|foo', $path);
-        $this->assertEquals('root!!idx_1!foo!!idx_2!', $result);
-        $this->assertEquals('path!root!!idx_1!foo!', $path);
+        $this->assertEqualsSha1('root!!idx_1!foo!!idx_2!', $result);
+        $this->assertEqualsSha1('path!root!!idx_1!foo!', $path);
 
         // Make sure re reuse the old index value we already looked up for 'root'.
         $result = $pool->exposeGetHierarchyKey('|bar', $path);
-        $this->assertEquals('root!!idx_1!bar!!idx_3!', $result);
-        $this->assertEquals('path!root!!idx_1!bar!', $path);
+        $this->assertEqualsSha1('root!!idx_1!bar!!idx_3!', $result);
+        $this->assertEqualsSha1('path!root!!idx_1!bar!', $path);
     }
 
     public function testClearHierarchyKeyCache()

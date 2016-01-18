@@ -57,7 +57,7 @@ trait HierarchicalCachePoolTrait
             // 1) $keyString = "foo!tagHash"
             // 2) $keyString = "foo!tagHash![foo_index]!bar!tagHash"
             $keyString .= $name;
-            $pathKey = 'path'.TaggablePoolInterface::TAG_SEPARATOR.$keyString;
+            $pathKey = sha1('path'.TaggablePoolInterface::TAG_SEPARATOR.$keyString);
 
             if (isset($this->keyCache[$pathKey])) {
                 $index = $this->keyCache[$pathKey];
@@ -74,7 +74,8 @@ trait HierarchicalCachePoolTrait
         // Assert: $pathKey = "path!foo!tagHash![foo_index]!bar!tagHash"
         // Assert: $keyString = "foo!tagHash![foo_index]!bar!tagHash![bar_index]!"
 
-        return $keyString;
+        // Make sure we do not get awfully long (>250 chars) keys
+        return sha1($keyString);
     }
 
     /**

@@ -24,7 +24,7 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
     {
         $path = null;
 
-        $pool = new CachePool();
+        $pool   = new CachePool();
         $result = $pool->exposeGetHierarchyKey('key', $path);
         $this->assertEquals('key', $result);
         $this->assertNull($path);
@@ -36,12 +36,12 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
     public function testCalculateHierarchyKey()
     {
-        $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        $pool                = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo|bar');
         $this->assertEquals('root!!idx_1!foo!!idx_2!bar!!idx_3!', $result);
         $this->assertEquals('path!root!!idx_1!foo!!idx_2!bar!', $path);
 
-        $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        $pool                = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         list($result, $path) = $pool->exposeCalculateHierarchyKey('|');
         $this->assertEquals('path!root!', $path);
         $this->assertEquals('root!!idx_1!', $result);
@@ -51,7 +51,7 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
     {
         $path = null;
 
-        $pool = new CachePool();
+        $pool   = new CachePool();
         $result = $pool->exposeGetHierarchyKey('key!tagHash', $path);
         $this->assertEquals('key!tagHash', $result);
         $this->assertNull($path);
@@ -59,12 +59,12 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
     public function testCalculateHierarchyKeyWithTags()
     {
-        $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        $pool                = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo|bar!tagHash');
         $this->assertEquals('root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash!idx_3!', $result);
         $this->assertEquals('path!root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash', $path);
 
-        $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        $pool                = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         list($result, $path) = $pool->exposeCalculateHierarchyKey('|!tagHash');
         $this->assertEquals('path!root!tagHash', $path);
         $this->assertEquals('root!tagHash!idx_1!', $result);
@@ -96,7 +96,7 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
 
     public function testKeyCache()
     {
-        $pool = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        $pool                = new CachePool(['idx_1', 'idx_2', 'idx_3']);
         list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo');
         $this->assertEquals('root!!idx_1!foo!!idx_2!', $result);
         $this->assertEquals('path!root!!idx_1!foo!', $path);

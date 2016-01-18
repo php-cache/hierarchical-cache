@@ -49,6 +49,22 @@ trait HierarchicalCachePoolTrait
             return $key;
         }
 
+        list($keyString, $pathKey) = $this->calculateHierarchyKey($key);
+
+        // Make sure we do not get awfully long (>250 chars) keys
+        $pathKey = sha1($pathKey);
+        $keyString = sha1($keyString);
+
+        return $keyString;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return array
+     */
+    private function calculateHierarchyKey($key)
+    {
         $key = $this->explodeKey($key);
 
         $keyString = '';
@@ -62,7 +78,7 @@ trait HierarchicalCachePoolTrait
             if (isset($this->keyCache[$pathKey])) {
                 $index = $this->keyCache[$pathKey];
             } else {
-                $index                    = $this->getValueFormStore($pathKey);
+                $index = $this->getValueFormStore($pathKey);
                 $this->keyCache[$pathKey] = $index;
             }
 
@@ -73,8 +89,7 @@ trait HierarchicalCachePoolTrait
 
         // Assert: $pathKey = "path!foo!tagHash![foo_index]!bar!tagHash"
         // Assert: $keyString = "foo!tagHash![foo_index]!bar!tagHash![bar_index]!"
-
-        return $keyString;
+        return array($keyString, $pathKey);
     }
 
     /**

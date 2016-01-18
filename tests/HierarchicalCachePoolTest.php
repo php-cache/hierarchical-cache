@@ -24,18 +24,25 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
     {
         $path = null;
 
-        $pool   = new CachePool();
+        $pool = new CachePool();
         $result = $pool->exposeGetHierarchyKey('key', $path);
         $this->assertEquals('key', $result);
         $this->assertNull($path);
 
+        $result = $pool->exposeGetHierarchyKey('|key', $path);
+        $this->assertEquals(sha1('root!!!key!!!'), $result);
+        $this->assertEquals(sha1('path!root!!!key!'), $path);
+    }
+
+    public function testCalculateHierarchyKey()
+    {
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
-        $result = $pool->exposeGetHierarchyKey('|foo|bar', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo|bar');
         $this->assertEquals('root!!idx_1!foo!!idx_2!bar!!idx_3!', $result);
         $this->assertEquals('path!root!!idx_1!foo!!idx_2!bar!', $path);
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
-        $result = $pool->exposeGetHierarchyKey('|', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|');
         $this->assertEquals('path!root!', $path);
         $this->assertEquals('root!!idx_1!', $result);
     }
@@ -44,18 +51,21 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
     {
         $path = null;
 
-        $pool   = new CachePool();
+        $pool = new CachePool();
         $result = $pool->exposeGetHierarchyKey('key!tagHash', $path);
         $this->assertEquals('key!tagHash', $result);
         $this->assertNull($path);
+    }
 
+    public function testCalculateHierarchyKeyWithTags()
+    {
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
-        $result = $pool->exposeGetHierarchyKey('|foo|bar!tagHash', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo|bar!tagHash');
         $this->assertEquals('root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash!idx_3!', $result);
         $this->assertEquals('path!root!tagHash!idx_1!foo!tagHash!idx_2!bar!tagHash', $path);
 
         $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
-        $result = $pool->exposeGetHierarchyKey('|!tagHash', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|!tagHash');
         $this->assertEquals('path!root!tagHash', $path);
         $this->assertEquals('root!tagHash!idx_1!', $result);
     }
@@ -68,27 +78,31 @@ class HierarchicalCachePoolTest extends \PHPUnit_Framework_TestCase
         $result = $pool->exposeGetHierarchyKey('key', $path);
         $this->assertEquals('key', $result);
         $this->assertNull($path);
+    }
 
-        $result = $pool->exposeGetHierarchyKey('|foo|bar', $path);
+    public function testCalculateHierarchyKeyEmptyCache()
+    {
+        $pool = new CachePool();
+        $path = null;
+
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo|bar');
         $this->assertEquals('root!!!foo!!!bar!!!', $result);
         $this->assertEquals('path!root!!!foo!!!bar!', $path);
 
-        $result = $pool->exposeGetHierarchyKey('|', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|');
         $this->assertEquals('path!root!', $path);
         $this->assertEquals('root!!!', $result);
     }
 
     public function testKeyCache()
     {
-        $path = null;
-
-        $pool   = new CachePool(['idx_1', 'idx_2', 'idx_3']);
-        $result = $pool->exposeGetHierarchyKey('|foo', $path);
+        $pool = new CachePool(['idx_1', 'idx_2', 'idx_3']);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|foo');
         $this->assertEquals('root!!idx_1!foo!!idx_2!', $result);
         $this->assertEquals('path!root!!idx_1!foo!', $path);
 
         // Make sure re reuse the old index value we already looked up for 'root'.
-        $result = $pool->exposeGetHierarchyKey('|bar', $path);
+        list($result, $path) = $pool->exposeCalculateHierarchyKey('|bar');
         $this->assertEquals('root!!idx_1!bar!!idx_3!', $result);
         $this->assertEquals('path!root!!idx_1!bar!', $path);
     }

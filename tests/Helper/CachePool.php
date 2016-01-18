@@ -34,7 +34,7 @@ class CachePool
 
     public function exposeClearHierarchyKeyCache()
     {
-        return $this->clearHierarchyKeyCache();
+        $this->clearHierarchyKeyCache();
     }
 
     public function exposeGetHierarchyKey($key, &$pathKey = null)
@@ -45,5 +45,10 @@ class CachePool
     protected function getValueFormStore($key)
     {
         return array_shift($this->storeValues);
+    }
+
+    public function exposeCalculateHierarchyKey($key)
+    {
+        return $this->calculateHierarchyKey($key);
     }
 }
